@@ -1,0 +1,85 @@
+<!-- {% extends 'layout2.html' %} -->
+
+{% block body %}
+
+<style>
+  html body {
+    background-color: rgb(206, 206, 228);
+  }
+</style>
+<!-- header section start -->
+<div class="header_section">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+     <div class="logo"><a href="{{ url_for('home2') }}"><img style = "width: 20% !important;" src="{{ url_for('static', filename='images/avodoc-high-resolution-logo-color-on-transparent-background (2).png') }}"></a></div>
+     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+     <span class="navbar-toggler-icon"></span>
+     </button>
+     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+           <a class="nav-item nav-link" href="{{ url_for('home1') }}">Home</a>
+       
+        </div>
+     </div>
+     <div class="login_menu">
+        <ul>
+         <li class="nav-item">
+             <a class="nav-link" href="{{ url_for('crop_recommend') }}">Crop</a>
+         </li>
+
+         <li class="nav-item">
+             <a class="nav-link" href="{{ url_for('disease_prediction') }}">Disease</a>
+         </li>
+         <li class="nav-item">
+             <a class="nav-link" href="{{ url_for('profile') }}">{{ username }}</a>
+         </li>
+         <li class="nav-item">
+             <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+         </li>
+        </ul>
+     </div>
+  </nav>
+<br /><br />
+  <h2 style="text-align: center; margin: 0px; color: black">
+    <b>Find out which disease your crop is suffreing</b>
+  </h2>
+  <br />
+  <br>
+
+<div style="
+    width: 350px;
+    height: 50rem;
+    margin: 0px auto;
+    color: black;
+    border-radius: 25px;
+    padding: 10px 10px;
+    font-weight: bold;
+  ">
+
+  
+
+
+  <form class="form-signin" method=post enctype=multipart/form-data>
+
+    <h2 class="h4 mb-3 font-weight-normal"><b>Please Upload The Image</b></h2>
+    <input type="file" name="file" class="form-control-file" id="inputfile" onchange="preview_image(event)" style="font-weight: bold;">
+    <br />
+    <img id="output-image" class="rounded mx-auto d-block" />
+    <button class="btn btn-lg btn-primary btn-block" type="submit" style="font-weight: bold;">Predict</button>
+
+
+  </form>
+</div>
+
+<script type="text/javascript">
+  function preview_image(event) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      var output = document.getElementById('output-image')
+      output.src = reader.result;
+    }
+    reader.readAsDataURL(event.target.files[0]);
+  }
+</script>
+
+</div>
+{% endblock %}

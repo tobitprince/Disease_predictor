@@ -1,0 +1,58 @@
+{% extends 'layout2.html' %}
+
+{% block body %}
+<!-- header section start -->
+<div class="header_section">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+       <div class="logo"><a href="{{ url_for('home2') }}"><img style = "width: 20% !important;" src="{{ url_for('static', filename='images/avodoc-high-resolution-logo-color-on-transparent-background (2).png') }}"></a></div>
+       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+       <span class="navbar-toggler-icon"></span>
+       </button>
+       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+             <a class="nav-item nav-link" href="{{ url_for('home2') }}">Home</a>
+         
+          </div>
+       </div>
+       <div class="login_menu">
+          <ul >
+           <li class="nav-item">
+               <a class="nav-link" href="{{ url_for('crop_recommend') }}">Crop</a>
+           </li>
+
+           <li class="nav-item">
+               <a class="nav-link" href="{{ url_for('disease_prediction') }}">Disease</a>
+           </li>
+           <li class="nav-item">
+               <a class="nav-link" href="{{ url_for('profile') }}">{{ username }}</a>
+           </li>
+           <li class="nav-item">
+               <a class="nav-link" href="#"><img src="{{ url_for('static', filename='images/search-icon.png') }}"></a>
+           </li>
+           <li class="nav-item">
+               <a class="nav-link" href="{{ url_for('logout') }}">LOG OUT</a>
+           </li>
+          </ul>
+       </div>
+    </nav>
+    <div class="container">
+    <h2>Profile Page</h2>
+    <div>
+        <p>Your account details are below:</p>
+        <table>
+            <tr>
+                <td>Username:</td>
+                <td>{{ account['username'] }}</td>
+            </tr>
+            <tr>
+                <td>Password:</td>
+                <td>******</td>
+            </tr>
+            <tr>
+                <td>Email:</td>
+                <td>{{ account['email'] }}</td>
+            </tr>
+        </table>
+    </div>
+    </div>
+{% endblock %}
