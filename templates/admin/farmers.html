@@ -1,0 +1,46 @@
+
+{% extends "admin/base.html" %}
+
+{% block content %}
+	<a class="btn btn-primary" href="./edit_farmers/add/0">
+		<i class="glyphicon glyphicon-plus-sign"></i> Add New Farmers
+	</a>
+	<h1>Farmers</h1>
+<p>This table includes {{table_count}} farmers</p>
+<table id="sorted" class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Status</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row_data in data %}
+        <tr>
+            <td>{{ row_data['id'] }}</td>
+            <td>{{ row_data['username'] }}</td>
+            <td>{{ row_data['email'] }}</td>
+            <td>{{ row_data['password'] }}</td>
+            <td>{{ row_data['status'] }}</td>
+            <td>
+                <a href="./edit_farmers/edit/{{ row_data['id'] }}">
+                    <i class="glyphicon glyphicon-edit"></i>
+                </a>
+            </td>
+            <td>
+                <a 
+                    href="./save?cat=farmers&act=delete&modifier=id&id={{ row_data['id'] }}"
+                    onclick="return navConfirm(this.href);">
+                <i class="glyphicon glyphicon-trash"></i>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

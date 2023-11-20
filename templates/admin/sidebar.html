@@ -1,0 +1,45 @@
+
+<!-- Sidebar Holder -->
+<nav id="sidebar" class="bg-primary">
+	<div class="sidebar-header">
+		<h3>
+			Avodoc Admin<br>
+			<i id="sidebarCollapse" class="glyphicon glyphicon-circle-arrow-left"></i>
+		</h3>
+		<strong>
+			Avodoc<br>
+			<i id="sidebarExtend" class="glyphicon glyphicon-circle-arrow-right"></i>
+		</strong>
+		
+	</div><!-- /sidebar-header -->
+	<!-- start sidebar -->
+	<ul class="list-unstyled components">
+		<li>
+			<a href="./" aria-expanded="false">
+				<i class="glyphicon glyphicon-home"></i>
+				Home
+			</a>
+		</li>
+
+<li>
+	<a href="/farmers">
+		<i class="glyphicon glyphicon-user"></i>
+		Farmers
+		<span class="pull-right">{{tables_and_counts.1.1}}</span>
+	</a>
+</li>
+
+<li>
+	<a href="/admintable">
+		<i class="glyphicon glyphicon-user"></i>
+		Admin
+		<span class="pull-right">{{tables_and_counts.0.1}}</span>
+	</a>
+</li>
+
+		<li><a href="/adminlogout"><i class="glyphicon glyphicon-log-out"></i> Logout</a></li>
+	</ul>
+	<div class ="visit">
+	<a href="./"><img src="{{ url_for('static', filename='images/palta.svg') }}" class="image" alt="" /></a>
+	</div>
+</nav><!-- / end sidebar -->

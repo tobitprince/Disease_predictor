@@ -23,6 +23,10 @@ from requests.auth import HTTPBasicAuth
 from datetime import datetime
 from dotenv import load_dotenv
 import os
+from functools import wraps
+from werkzeug.security import generate_password_hash, check_password_hash
+
+
 
 #from android.permissions import Permission, request_permission
 #request_permission([Permission.READ_EXTERNAL_STOARGE,Permission.WRITE_EXTERNAL_STOARGE])
@@ -48,7 +52,6 @@ app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
 
 # Intialize MySQL
 mysql = MySQL(app)
-
 
 disease_classes = ['Apple___Apple_scab',
                    'Apple___Black_rot',
@@ -331,238 +334,14 @@ def logout():
    # Redirect to login page
    return redirect(url_for('login'))
 
+
+#####MPESAAA
+
 @ app.route('/mpesa')
 def mpesa():
     return render_template('mpesa/index.html')
    
 
-@ app.route('/mpesastk')
-def mpesastk():
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
-
-
-    datez = date_default_timezone_set('Africa/Nairobi')
-
-    
-
-    # define the variales
-    # provide the following details, this part is found on your test credentials on the developer account
-    BusinessShortCode = '174379'
-    Passkey = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919';  
-  
-    
-    #This are your info, for
-    #PartyA should be the ACTUAL clients phone number or your phone number, format 2547********
-    #AccountRefference, it maybe invoice number, account number etc on production systems, but for test just put anything
-    #TransactionDesc can be anything, probably a better description of or the transaction
-    #Amount this is the total invoiced amount, Any amount here will be 
-    #actually deducted from a clients side/your test phone number once the PIN has been entered to authorize the transaction. 
-    #for developer/test accounts, this money will be reversed automatically by midnight.
-   
-    PartyA = request.form['phone'] # This is your phone number, 
-    AccountReference = '2255'
-    TransactionDesc = 'Test Payment'
-    Amount = request.form['amount']
- 
-    # Get the timestamp, format YYYYmmddhms -> 20181004151020
-    Timestamp = date('YmdHis');    
-  
-    # Get the base64 encoded string -> $password. The passkey is the M-PESA Public Key
-    Password = base64_encode(BusinessShortCode.Passkey.Timestamp)
-
-    # header for access token
-    headers = ['Content-Type:application/json; charset=utf8'];
-
-    # M-PESA endpoint urls
-    access_token_url = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials';
-    initiate_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
-
-    # callback url
-    CallBackURL = 'https://avodoc-6ab21772621e.herokuapp.com/mpesa/index.php';  
-
-    curl = curl_init(access_token_url)
-    curl_setopt(curl, CURLOPT_HTTPHEADER, headers)
-    curl_setopt(curl, CURLOPT_RETURNTRANSFER, TRUE)
-    curl_setopt(curl, CURLOPT_HEADER, FALSE)
-    curl_setopt(curl, CURLOPT_USERPWD, consumerKey.':'.consumerSecret)
-    result = curl_exec(curl)
-    status = curl_getinfo(curl, CURLINFO_HTTP_CODE)
-    result = json_decode(result)
-    access_token = result->access_token;  
-    curl_close(curl)
-
-    # header for stk push
-    stkheader = ['Content-Type:application/json','Authorization:Bearer '.access_token]
-
-    # initiating the transaction
-    curl = curl_init()
-    curl_setopt(curl, CURLOPT_URL, initiate_url)
-    curl_setopt(curl, CURLOPT_HTTPHEADER, stkheader); #setting custom header
-
-    curl_post_data = array(
-        #Fill in the request parameters with valid values
-        'BusinessShortCode' => BusinessShortCode,
-        'Password' => Password,
-        'Timestamp' => Timestamp,
-        'TransactionType' => 'CustomerPayBillOnline',
-        'Amount' => Amount,
-        'PartyA' => PartyA,
-        'PartyB' => BusinessShortCode,
-        'PhoneNumber' => PartyA,
-        'CallBackURL' => CallBackURL,
-        'AccountReference' => AccountReference,
-        'TransactionDesc' => TransactionDesc
-    )
-
-    data_string = json_encode(curl_post_data)
-    curl_setopt(curl, CURLOPT_RETURNTRANSFER, true)
-    curl_setopt(curl, CURLOPT_POST, true)
-    curl_setopt(curl, CURLOPT_POSTFIELDS, data_string)
-    curl_response = curl_exec(curl)
-    print_r(curl_response)
-
-    echo curl_response
-        return render_template('mpesa/index.html')
-######################################################################
-@app.route('/access_token')
-def get_access_token():
-    consumer_key = consumer_key
-    consumer_secret = consumer_secret
-    endpoint = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
-
-    r = requests.get(endpoint, auth=HTTPBasicAuth(consumer_key, consumer_secret))
-    data = r.json()
-    return data['access_token']
-
-@app.route('/register')
-def register_urls():
-    endpoint = 'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl'
-    access_token = _access_token()
-    my_endpoint = base_url + "c2b/"
-    headers = { "Authorization": "Bearer %s" % access_token }
-    r_data = {
-        "ShortCode": "174379",
-        "ResponseType": "Completed",
-        "ConfirmationURL": my_endpoint + 'con',
-        "ValidationURL": my_endpoint + 'val'
-    }
-
-    response = requests.post(endpoint, json = r_data, headers = headers)
-    return response.json()
-
-
-@app.route('/simulate')
-def test_payment():
-    endpoint = 'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/simulate'
-    access_token = _access_token()
-    headers = { "Authorization": "Bearer %s" % access_token }
-
-    data_s = {
-        "Amount": 100,
-        "ShortCode": "174379",
-        "BillRefNumber": "test",
-        "CommandID": "CustomerPayBillOnline",
-        "Msisdn": "254708374149"
-    }
-
-    res = requests.post(endpoint, json= data_s, headers = headers)
-    return res.json()
-
-@app.route('/b2c')
-def make_payment():
-    endpoint = 'https://sandbox.safaricom.co.ke/mpesa/b2c/v1/paymentrequest'
-    access_token = _access_token()
-    headers = { "Authorization": "Bearer %s" % access_token }
-    my_endpoint = base_url + "/b2c/"
-
-    data = {
-        "InitiatorName": "apitest342",
-        "SecurityCredential": "SQFrXJpsdlADCsa986yt5KIVhkskagK+1UGBnfSu4Gp26eFRLM2eyNZeNvsqQhY9yHfNECES3xyxOWK/mG57Xsiw9skCI9egn5RvrzHOaijfe3VxVjA7S0+YYluzFpF6OO7Cw9qxiIlynYS0zI3NWv2F8HxJHj81y2Ix9WodKmCw68BT8KDge4OUMVo3BDN2XVv794T6J82t3/hPwkIRyJ1o5wC2teSQTgob1lDBXI5AwgbifDKe/7Y3p2nn7KCebNmRVwnsVwtcjgFs78+2wDtHF2HVwZBedmbnm7j09JO9cK8glTikiz6H7v0vcQO19HcyDw62psJcV2c4HDncWw==",
-        "CommandID": "BusinessPayment",
-        "Amount": "200",
-        "PartyA": "174379",
-        "PartyB": "254708374149",
-        "Remarks": "Pay Salary",
-        "QueueTimeOutURL": my_endpoint + "timeout",
-        "ResultURL": my_endpoint + "result",
-        "Occasion": "Salary"
-    }
-
-    res = requests.post(endpoint, json = data, headers = headers)
-    return res.json()
-
-@app.route('/lnmo')
-def init_stk():
-    endpoint = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
-    access_token = _access_token()
-    headers = { "Authorization": "Bearer %s" % access_token }
-    my_endpoint = base_url + "/lnmo"
-    Timestamp = datetime.now()
-    times = Timestamp.strftime("%Y%m%d%H%M%S")
-    password = "174379" + "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919" + times
-    datapass = base64.b64encode(password.encode('utf-8'))
-
-    data = {
-        "BusinessShortCode": "174379",
-        "Password": datapass,
-        "Timestamp": times,
-        "TransactionType": "CustomerPayBillOnline",
-        "PartyA": request.form['phone'], # fill with your phone number
-        "PartyB": "174379",
-        "PhoneNumber": request.form['phone'], # fill with your phone number
-        "CallBackURL": my_endpoint,
-        "AccountReference": "TestPay",
-        "TransactionDesc": "HelloTest",
-        "Amount": 2
-    }
-
-    res = requests.post(endpoint, json = data, headers = headers)
-    return res.json()
-
-@app.route('/lnmo', methods=['POST'])
-def lnmo_result():
-    data = request.get_data()
-    f = open('lnmo.json', 'a')
-    f.write(data)
-    f.close()
-
-@app.route('/b2c/result', methods=['POST'])
-def result_b2c():
-    data = request.get_data()
-    f = open('b2c.json', 'a')
-    f.write(data)
-    f.close()
-
-@app.route('/b2c/timeout', methods=['POST'])
-def b2c_timeout():
-    data = request.get_json()
-    f = open('b2ctimeout.json', 'a')
-    f.write(data)
-    f.close()
-
-@app.route('/c2b/val', methods=['POST'])
-def validate():
-    data = request.get_data()
-    f = open('data_v.json', 'a')
-    f.write(data)
-    f.close()
-
-@app.route('/c2b/con', methods=['POST'])
-def confirm():
-    data = request.get_json()
-    f = open('data_c.json', 'a')
-    f.write(data)
-    f.close()
-
-
-def _access_token():
-    consumer_key = consumer_key
-    consumer_secret = consumer_secret
-    endpoint = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
-
-    r = requests.get(endpoint, auth=HTTPBasicAuth(consumer_key, consumer_secret))
-    data = r.json()
-    return data['access_token']
 
 
 
@@ -570,6 +349,7 @@ def _access_token():
 
 
 
+##ADMIN 
 ####################################
 def login_required(f):
 	@wraps(f)
@@ -593,27 +373,6 @@ def index():
 	return render_template('admin/index.html')
 
 
-@app.route("/adminold")
-@login_required
-def adminold():
-	data = fetch_all(mysql, "adminold")
-	return render_template('admin/adminold.html', data=data, table_count=len(data))
-
-
-@app.route('/edit_adminold/<string:act>/<int:modifier_id>', methods=['GET', 'POST'])
-@login_required
-def edit_adminold(modifier_id, act):
-	if act == "add":
-		return render_template('admin/edit_adminold.html', data="", act="add")
-	else:
-		data = fetch_one(mysql, "adminold", "id", modifier_id)
-	
-		if data:
-			return render_template('admin/edit_adminold.html', data=data, act=act)
-		else:
-			return 'Error loading #%s' % modifier_id
-
-
 @app.route("/farmers")
 @login_required
 def farmers():
@@ -635,23 +394,23 @@ def edit_farmers(modifier_id, act):
 			return 'Error loading #%s' % modifier_id
 
 
-@app.route("/users")
+@app.route("/admintable")
 @login_required
-def users():
-	data = fetch_all(mysql, "users")
-	return render_template('admin/users.html', data=data, table_count=len(data))
+def admintable():
+	data = fetch_all(mysql, "admintable")
+	return render_template('admin/admintable.html', data=data, table_count=len(data))
 
 
-@app.route('/edit_users/<string:act>/<int:modifier_id>', methods=['GET', 'POST'])
+@app.route('/edit_admintable/<string:act>/<int:modifier_id>', methods=['GET', 'POST'])
 @login_required
-def edit_users(modifier_id, act):
+def edit_admintable(modifier_id, act):
 	if act == "add":
-		return render_template('admin/edit_users.html', data="", act="add")
+		return render_template('admin/edit_admintable.html', data="", act="add")
 	else:
-		data = fetch_one(mysql, "users", "id", modifier_id)
+		data = fetch_one(mysql, "admintable", "id", modifier_id)
 	
 		if data:
-			return render_template('admin/edit_users.html', data=data, act=act)
+			return render_template('admin/edit_admintable.html', data=data, act=act)
 		else:
 			return 'Error loading #%s' % modifier_id
 
@@ -678,7 +437,7 @@ def save():
 
 
 @app.route('/adminlogin')
-def login():
+def adminlogin():
 	if 'authorised' in session:
 		return redirect(url_for('admin'))
 	else:
@@ -688,33 +447,128 @@ def login():
 
 @app.route('/login_handler', methods=['POST'])
 def login_handler():
-	try:
-		email = request.form['email']
-		password = request.form['password']
-		data = fetch_one(mysql, "users", "email", email)
-		
-		if data and len(data) > 0:
-			if check_password_hash(data[3], password) or hashlib.md5(password.encode('utf-8')).hexdigest() == data[3]:
-				session['authorised'] = 'authorised',
-				session['id'] = data[0]
-				session['name'] = data[1]
-				session['email'] = data[2]
-				session['role'] = data[4]
-				return redirect(url_for('index'))
-			else:
-				return redirect(url_for('login', error='Wrong Email address or Password.'))
-		else:
-			return redirect(url_for('login', error='No user'))
-	
-	except Exception as e:
-		return render_template('admin/login.html', error=str(e))
+    email = request.form['email']
+    password = request.form['password']
+    print(f"Email: {email}, Password: {password}")  # Debug print
+    try:
+        data = fetch_one(mysql, "admintable", "email", email)
+        print(f"Data fetched from database: {data}")  # Debug print
+    except Exception as e:
+        return render_template('admin/login.html', error=str(e))
+
+    if data and len(data) > 0:
+        password_check = check_password_hash(data['password'], password)
+        print(f"Password check result: {password_check}")  # Debug print
+        if password_check:
+            session['authorised'] = 'authorised',
+            session['id'] = data['id']
+            session['name'] = data['name']
+            session['email'] = data['email']
+            session['role'] = data['role']
+            return redirect(url_for('index'))
+        else:
+            return redirect(url_for('adminlogin', error='Wrong Email address or Password.'))
+    else:
+        return redirect(url_for('adminlogin', error='No user'))
 
 
 @app.route('/adminlogout')
 @login_required
-def logout():
+def adminlogout():
 	session.clear()
 	return redirect(url_for('adminlogin'))
+
+
+def fetch_all(mysql, table_name):
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.execute("SELECT * FROM " + table_name)
+	data = cursor.fetchall()
+	if data is None:
+		return "Problem!"
+	else:
+		return data
+
+
+def fetch_one(mysql, table_name, column, value):
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.execute("SELECT * FROM " + table_name + " WHERE " + column + " = '" + str(value) + "'")
+	data = cursor.fetchone()
+	if data is None:
+		return "Problem!"
+	else:
+		return data
+
+
+def count_all(mysql):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SHOW TABLES")
+    tables = cursor.fetchall()
+    data = ()
+    
+    for table in tables:
+        # Check if the table list is not empty
+        if table:
+            table_name = table['Tables_in_' + app.config['MYSQL_DB']]
+            data += ((table_name, count_table(mysql, table_name)),)
+    
+    return data
+
+
+def count_table(mysql, table_name):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT COUNT(*) as count FROM " + table_name)
+    table_count = cursor.fetchone()
+    return table_count['count']
+
+
+def clean_data(data):
+	del data["cat"]
+	del data["act"]
+	del data["id"]
+	del data["modifier"]
+	return data
+
+
+def insert_one(mysql, table_name, data):
+    data = clean_data(data)
+    columns = ','.join(data.keys())
+    values = ','.join([str("'" + e + "'") for e in data.values()])
+    insert_command = "INSERT into " + table_name + " (%s) VALUES (%s) " % (columns, values)
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute(insert_command)
+        mysql.connection.commit()
+        return True
+    except Exception as e:
+        print("Problem inserting into db: " + str(e))
+        return False
+
+
+def update_one(mysql, table_name, data, modifier, item_id):
+	data = clean_data(data)
+	update_command = "UPDATE " + table_name + " SET {} WHERE " + modifier + " = " + item_id + " LIMIT 1"
+	update_command = update_command.format(", ".join("{}= '{}'".format(k, v) for k, v in data.items()))
+	try:
+		cursor = mysql.connection.cursor()
+		cursor.execute(update_command)
+		mysql.connection.commit()
+		return True
+	except Exception as e:
+		print("Problem updating into db: " + str(e))
+		return False
+
+
+def delete_one(mysql, table_name, modifier, item_id):
+	try:
+		cursor = mysql.connection.cursor()
+		delete_command = "DELETE FROM " + table_name + " WHERE " + modifier + " = " + item_id + " LIMIT 1"
+		cursor.execute(delete_command)
+		mysql.connection.commit()
+		return True
+	except Exception as e:
+		print("Problem deleting from db: " + str(e))
+		return False
+
 
 if __name__ == "__main__":
 	app.run(debug=True)
