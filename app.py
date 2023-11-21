@@ -339,7 +339,7 @@ def mpesa():
     return render_template('mpesa/index.html')
 
 #intitate mpesa request
-@app.route('/pay')
+@app.route('/pay', methods=['GET', 'POST'])
 def pay():
       if request.method == 'POST':
             amount = request.form['amount']
