@@ -9,7 +9,8 @@
 		<!-- Latest compiled and minified CSS -->
 		<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous"> -->
 		<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" integrity="sha384-h21C2fcDk/eFsW9sC9h0dhokq5pDinLNklTKoxIZRUn3+hvmgQSffLLQ4G4l2eEr" crossorigin="anonymous">
-
+		<!-- fevicon -->
+		<link rel="icon" href="{{ url_for('static', filename='images/logo3.png') }}" type="image/gif" />
 		<!-- Custom CSS -->
 		<link rel="stylesheet" href="/static/css/styleadmin.css">
 		<link href="//cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -20,7 +21,11 @@
 			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 		<![endif]-->
 		<style type="text/css">
-			body { padding-top: 40px}
+			body {
+        background-color: #000000 !important;
+        background-image: url(static/images/crop_background.jpg);
+        font-family: "Rubik", sans-serif;
+       padding-top: 40px}
 			h3, h4 {text-align: center}
 			form { max-width: 330px; margin: 0 auto}
 			input, h3, h4 { margin-bottom: 10px; padding: 10px}
@@ -28,10 +33,12 @@
 
 	</head>
 	<body>
-		<div class="container">
-			<form action="/login_handler" method="post">
-				<h3>Welcome to Avodoc Admin</h3>
-				<h4>Sign in</h4>
+		<a href="./"><img style="height: 200px;" src="{{ url_for('static', filename='images/palta.svg') }}" class="image" alt="" /></a>
+		<div class="container" >
+			
+			<form action="/login_handler" method="post" style="background-color: #a6b1cb52; padding: 50px;">
+				<h3 style="font-weight: bolder;">Welcome to Avodoc Admin </h3>
+				<h4 style="font-weight: 500;">Sign in</h4>
 
 				{% if error is defined and error != '' %}
 				<div class="alert alert-danger" role="alert">
@@ -42,10 +49,10 @@
 				{% endif %}
 
 				<label for="inputEmail" class="sr-only">Email address</label>
-				<input type="text" name="email" class="form-control" placeholder="Email address" required autofocus>
+				<input type="text" name="email" id="inputEmail" class="form-control" placeholder="Email address" autocomplete="email" required autofocus>
 
 				<label for="inputPassword" class="sr-only">Password</label>
-				<input type="password" name="password" class="form-control" placeholder="Password" required>
+				<input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
 
 				<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
 			</form>

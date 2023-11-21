@@ -25,11 +25,8 @@ from dotenv import load_dotenv
 import os
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
+import base64
 
-
-
-#from android.permissions import Permission, request_permission
-#request_permission([Permission.READ_EXTERNAL_STOARGE,Permission.WRITE_EXTERNAL_STOARGE])
 
 
 app = Flask(__name__)
@@ -241,7 +238,7 @@ def register():
         # Form is empty... (no POST data)
         flash("Please fill out the form!", "danger")
     # Show registration form with message (if any)
-    return render_template('login/signup-login.html')
+    return render_template('login/signup-login.html', msg = msg)
 
 def weather_fetch(city_name):
     """
@@ -340,9 +337,61 @@ def logout():
 @ app.route('/mpesa')
 def mpesa():
     return render_template('mpesa/index.html')
+
+#intitate mpesa request
+@app.route('/pay')
+def pay():
+      if request.method == 'POST':
+            amount = request.form['amount']
+            phone = request.form['phone']
+
+            endpoint = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
+            access_token = get_access_token()
+            headers = { "Authorization": "Bearer %s" % access_token }
+            Timestamp = datetime.now()
+            times = Timestamp.strftime("%Y%m%d%H%M%S")
+            password = "174379" + "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919" + times
+            password = base64.b64encode(password.encode['utf-8'])
+
+            data = {
+                "BusinessShortCode": "174379",
+                "Password": password,
+                "Timestamp": times,
+                "TransactionType": "CustomerPayBillOnline",
+                "PartyA": phone, # fill with your phone number
+                "PartyB": "174379",
+                "PhoneNumber": phone, # fill with your phone number
+                "CallBackURL": os.getenv('my_endpoint') + "/lnmo-callback",
+                "AccountReference": "TestPay",
+                "TransactionDesc": "HelloTest",
+                "Amount": amount
+            }
+
+            res = requests.post(endpoint, json = data, headers = headers)
+            return res.json()
+      elif request.method == 'POST':
+        # Form is empty... (no POST data)
+        msg = "Please fill out the form!", "danger"
+        # Show mpesa form with message (if any)
+        return render_template('mpesa/index.html', msg = msg)
+      
+#consume mpesa callback
+@app.route('/lnmo-callback', methods = ["POST"])
+def incoming():
+      data = request.get_json()
+      print(data)
+      return "ok"
+      
    
+@app.route('/access_token')
+def get_access_token():
+    consumer_key = os.getenv('consumer_key')
+    consumer_secret = os.getenv('consumer_secret')
+    endpoint = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
 
-
+    r = requests.get(endpoint, auth=HTTPBasicAuth(consumer_key, consumer_secret))
+    data = r.json()
+    return data['access_token']
 
 
 
