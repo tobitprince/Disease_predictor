@@ -7,7 +7,7 @@
     <title>Verify | Avodoc</title>
     <!-- Social media CDN -->
     <script src='https://kit.fontawesome.com/a076d05399.js'></script>
-    <link rel="stylesheet" href="style-verification.css">
+    <link rel="stylesheet" href="static/css/style-verification.css">
     <link rel="icon" href="static/images/logo3.png" type="image/gif" />
   </head>
   <style>
@@ -18,11 +18,11 @@
     <div class="container">
       <div class="forms-container">
         <div class="reset-password">
-          <form action="connection.php" class="sign-in-form" method="POST">
+          <form action="/verify-email" class="sign-in-form" method="POST">
             <h2 class="title">Verify Account</h2>
            	<div class="input-field">
               <i class="fas fa-key"></i>
-              <input type="text" placeholder="OTP code" name="otp_code" id="code">
+              <input type="text" placeholder="OTP code" name="token" id="code">
             </div>   
             <input type="submit" value="Verify" class="btn solid" name="verify">
           </form>
@@ -39,7 +39,7 @@
                 We will help you to verify your account ASAP.
             </p>
           </div>
-          <img src="img.svg" class="image" alt="" />
+          <img src="static/images/img.svg" class="image" alt="" />
         </div>
       </div>
   </div>

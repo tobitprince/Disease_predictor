@@ -26,8 +26,12 @@ import os
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 import base64
-from flask_mail import Mail
+from flask_mail import Mail, Message
 import jwt
+import smtplib, ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 
 
 
@@ -172,46 +176,38 @@ def login():
 # http://localhost:5000/login/ - this will be the login page, we need to use both GET and POST requests
 @app.route('/logini', methods=['GET', 'POST'])
 def logini():
-    # Output message if something goes wrong...
-    # Check if "username" and "password" POST requests exist (user submitted form)
+    msg = ''
     if request.method == 'POST' and 'email' in request.form and 'password' in request.form:
-        # Check database connection
-        # Create variables for easy access
         email = request.form['email']
         password = request.form['password']
 
-        # Retrieve the hashed password
         hash = password + os.getenv('app.secret_key')
         hash = hashlib.sha1(hash.encode())
         password = hash.hexdigest()
 
-        # Get cursor
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
-        # Check if account exists using MySQL
         cursor.execute('SELECT * FROM farmers WHERE email = %s AND password = %s', (email, password))
-
-        # Fetch one record and return result
         account = cursor.fetchone()
 
-        # If account exists in accounts table in our database
         if account:
-            # Create session data, we can access this data in other routes
-            session['loggedin'] = True
-            session['id'] = account['id']
-            session['username'] = account['username']
+            cursor.execute('SELECT * FROM farmers WHERE email = %s AND password = %s AND status = 1', (email, password))
+            verified_account = cursor.fetchone()
+            if verified_account:
+                session['loggedin'] = True
+                session['id'] = account['id']
+                session['username'] = account['username']
 
-            # Commit changes to the database
-            mysql.connection.commit()
+                mysql.connection.commit()
 
-            # Redirect to home page
-            return redirect(url_for('home2'))
+                return redirect(url_for('home2'))
+            else:
+                msg = 'Account not verified!'
+                flash("Account not verified!", "danger")
         else:
-            # Account doesn't exist or username/password incorrect
             msg = 'Incorrect username/password!'
-            print("Flash message set!")
             flash("Incorrect username/password!", "danger")
-    print("Redirecting to login page")
+
     return render_template('login/signup-login.html', msg=msg)
 # http://localhost:5000/pythonlogin/register 
 # This will be the registration page, we need to use both GET and POST requests
@@ -241,7 +237,7 @@ def register():
         else:
     
             # Hash the password
-            hash = password + app.secret_key
+            hash = password + os.getenv('app.secret_key')
             hash = hashlib.sha1(hash.encode())
             password = hash.hexdigest()
             print(password)
@@ -249,16 +245,69 @@ def register():
             cursor.execute('INSERT INTO farmers VALUES (NULL, %s, %s, %s, %s)', (username,email_address, password, status))
             mysql.connection.commit()
             token = jwt.encode(
-            {
-                "email_address": email_address,
-                "password": password,
-            }, os.getenv('app.secret_key')
+                {
+                    "email_address": email_address,
+                    "password": password,
+                }, os.getenv('app.secret_key')
             )
+
+            # Ensure the token is a byte string
+            if isinstance(token, str):
+                token = token.encode()
+
+            # Now you can decode the token
+            decoded_data = jwt.decode(token, os.getenv('app.secret_key'), algorithms=["HS256"])
             print(f"Type of email_address: {type(email_address)}")
+            port = os.getenv('port')  # For starttls
+            smtp_server = os.getenv('smtp_server')
+            sender_email = os.getenv('sender_email')
+            receiver_email = email_address
+            password = os.getenv('password')
             try:
-                msg = Message('Hello from the other side!', sender =   'princekiptoo@gmail.com', recipients = email_address)
-                msg.body = "hey, sending out email from flask!!!"
-                mail.send(msg)
+                # Convert the token to a string
+                token_str = token.decode('utf-8')
+                message = MIMEMultipart("alternative")
+                message["Subject"] = "OTP"
+                message["From"] = sender_email
+                message["To"] = receiver_email
+
+                # Create the plain-text and HTML version of your message
+                text = """\
+                Hi,
+                Dear user, Your verification OTP code is {token}
+                With regards,
+                Avodoc""".format(token=token_str)
+                html = """\
+                <html>
+                <body>
+                    <p>Hi,<br>
+                    Dear user, </p> <h3>Your verification OTP code is
+                    <br><br>
+                      {token}
+                    </p>
+                    <br><br>
+                    <p>With regards,</p>
+                    <b>Avodoc</b>
+                </body>
+                </html>
+                """.format(token=token_str)
+
+                # Turn these into plain/html MIMEText objects
+                part1 = MIMEText(text, "plain")
+                part2 = MIMEText(html, "html")
+
+                # Add HTML/plain-text parts to MIMEMultipart message
+                # The email client will try to render the last part first
+                message.attach(part1)
+                message.attach(part2)
+
+                context = ssl.create_default_context()
+                with smtplib.SMTP(smtp_server, port) as server:
+                    server.ehlo()  # Can be omitted
+                    server.starttls(context=context)
+                    server.ehlo()  # Can be omitted
+                    server.login(sender_email, password)
+                    server.sendmail(sender_email, receiver_email, message.as_string())
                 
             except Exception as e:
                 print(f"Error sending email: {e}")
@@ -366,25 +415,23 @@ def logout():
 ############OTP
 @app.route("/verify-email", methods=['GET', 'POST'])
 def verify_email():
-    if request.method == 'POST' :
+    msg = ''
+    if request.method == 'POST':
         token = request.form['token']
-        data = jwt.decode(token, os.getenv('app.secret_key'))
+        data = jwt.decode(token, os.getenv('app.secret_key'),algorithms=["HS256"])
         email_address = data["email_address"]
         password = data["password"]
-        ... # Create the user
+        # Create the user
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        # cursor.execute('SELECT * FROM farmers WHERE username = %s', (username))
-        cursor.execute( "UPDATE farmers SET status = 1 WHERE email = %s",(email_address) )
+        cursor.execute("UPDATE farmers SET status = 1 WHERE email = %s", (email_address,))
+        mysql.connection.commit()
 
         msg = 'Account verified'
-        flash("You have successfully registered!", "success")
+        flash("Your account has successfully been registered!", "success")
         return render_template('login/signup-login.html', msg=msg)
-    elif request.method == 'POST':
-        # Form is empty... (no POST data)
-        msg = 'Please fill out the form!'
-        flash("Please fill out the form!", "danger")
-    # Show registration form with message (if any)
-    return render_template('login/verify_email.html', msg = msg)
+    elif request.method == 'GET':
+        # Show registration form with message (if any)
+        return render_template('login/verify_email.html', msg=msg)
 
 
 
