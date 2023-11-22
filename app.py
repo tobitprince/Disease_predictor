@@ -281,7 +281,7 @@ def register():
                 <html>
                 <body>
                     <p>Hi,<br>
-                    Dear user, </p> <h3>Your verification OTP code is
+                    Dear user, </p> <h3>Your verification OTP code is </h3>
                     <br><br>
                       {token}
                     </p>
@@ -416,22 +416,27 @@ def logout():
 @app.route("/verify-email", methods=['GET', 'POST'])
 def verify_email():
     msg = ''
-    if request.method == 'POST':
-        token = request.form['token']
-        data = jwt.decode(token, os.getenv('app.secret_key'),algorithms=["HS256"])
-        email_address = data["email_address"]
-        password = data["password"]
-        # Create the user
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute("UPDATE farmers SET status = 1 WHERE email = %s", (email_address,))
-        mysql.connection.commit()
+    try:
+        if request.method == 'POST':
+            token = request.form['token']
+            data = jwt.decode(token, os.getenv('app.secret_key'),algorithms=["HS256"])
+            email_address = data["email_address"]
+            password = data["password"]
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute("UPDATE farmers SET status = 1 WHERE email = %s", (email_address,))
+            mysql.connection.commit()
 
-        msg = 'Account verified'
-        flash("Your account has successfully been registered!", "success")
-        return render_template('login/signup-login.html', msg=msg)
-    elif request.method == 'GET':
-        # Show registration form with message (if any)
-        return render_template('login/verify_email.html', msg=msg)
+            msg = 'Account verified'
+            flash("Your account has successfully been registered!", "success")
+            return render_template('login/signup-login.html', msg=msg)
+        elif request.method == 'GET':
+            return render_template('login/verify_email.html', msg=msg)
+    except jwt.DecodeError:
+        flash("Invalid token!", "danger")
+        return render_template('login/verify_email.html', msg='Invalid token')
+    except Exception as e:
+        flash(str(e), "danger")
+        return render_template('login/verify_email.html', msg='An error occurred')
 
 
 
@@ -458,7 +463,7 @@ def pay():
             Timestamp = datetime.now()
             times = Timestamp.strftime("%Y%m%d%H%M%S")
             password = "174379" + "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919" + times
-            password = base64.b64encode(password.encode['utf-8'])
+            password = base64.b64encode(password.encode('utf-8')).decode('utf-8')
 
             data = {
                 "BusinessShortCode": "174379",
@@ -476,7 +481,7 @@ def pay():
 
             res = requests.post(endpoint, json = data, headers = headers)
             return res.json()
-      elif request.method == 'POST':
+      else:
         # Form is empty... (no POST data)
         msg = "Please fill out the form!", "danger"
         # Show mpesa form with message (if any)
@@ -497,8 +502,13 @@ def get_access_token():
     endpoint = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
 
     r = requests.get(endpoint, auth=HTTPBasicAuth(consumer_key, consumer_secret))
-    data = r.json()
-    return data['access_token']
+    try:
+        data = r.json()
+        return data['access_token']
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+        print(f"Response: {r.text}")
+        return "Error occurred"
 
 
 
