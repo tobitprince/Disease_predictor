@@ -26,6 +26,8 @@ import os
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 import base64
+from flask_mail import Mail
+import jwt
 
 
 
@@ -40,6 +42,18 @@ consumerKey = os.getenv('consumerKey') #Fill with your app Consumer Key
 consumerSecret = os.getenv('consumerSecret') # Fill with your app Secret
 base_url = os.getenv('base_url')
 
+##Set up the configuration for flask_mail.
+app.config['MAIL_SERVER']=os.getenv('MAIL_SERVER')
+app.config['MAIL_PORT'] = os.getenv('MAIL_PORT')
+##update it with your gmail
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+##update it with your password
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+##app.config["EMAIL_SENDER"] = os.getenv('MAIL_SENDER')
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS')
+app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL')
+
+
 # Enter your database connection details below
 app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
 app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
@@ -49,6 +63,9 @@ app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
 
 # Intialize MySQL
 mysql = MySQL(app)
+
+#Create an instance of Mail.
+mail = Mail(app)
 
 disease_classes = ['Apple___Apple_scab',
                    'Apple___Black_rot',
@@ -164,7 +181,7 @@ def logini():
         password = request.form['password']
 
         # Retrieve the hashed password
-        hash = password + app.secret_key
+        hash = password + os.getenv('app.secret_key')
         hash = hashlib.sha1(hash.encode())
         password = hash.hexdigest()
 
@@ -205,7 +222,7 @@ def register():
         # Create variables for easy access
         username = request.form['uname']
         password = request.form['password']
-        email = request.form['email']
+        email_address = request.form['email']
         status = 0
                 # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -215,29 +232,44 @@ def register():
         # If account exists show error and validation checks
         if account:
             flash("Account already exists!", "danger")
-        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email_address):
             flash("Invalid email address!", "danger")
         elif not re.match(r'[A-Za-z0-9]+', username):
             flash("Username must contain only characters and numbers!", "danger")
-        elif not username or not password or not email:
+        elif not username or not password or not email_address:
             flash("Incorrect username/password!", "danger")
         else:
+    
             # Hash the password
             hash = password + app.secret_key
             hash = hashlib.sha1(hash.encode())
             password = hash.hexdigest()
             print(password)
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
-            cursor.execute('INSERT INTO farmers VALUES (NULL, %s, %s, %s, %s)', (username,email, password, status))
+            cursor.execute('INSERT INTO farmers VALUES (NULL, %s, %s, %s, %s)', (username,email_address, password, status))
             mysql.connection.commit()
-            msg = 'You have successfully registered!'
-            flash("You have successfully registered!", "success")
-            return render_template('login/signup-login.html', msg=msg)
+            token = jwt.encode(
+            {
+                "email_address": email_address,
+                "password": password,
+            }, os.getenv('app.secret_key')
+            )
+            print(f"Type of email_address: {type(email_address)}")
+            try:
+                msg = Message('Hello from the other side!', sender =   'princekiptoo@gmail.com', recipients = email_address)
+                msg.body = "hey, sending out email from flask!!!"
+                mail.send(msg)
+                
+            except Exception as e:
+                print(f"Error sending email: {e}")
+            return render_template("login/verify_email.html")
 
     elif request.method == 'POST':
         # Form is empty... (no POST data)
+        msg = 'Fill form'
         flash("Please fill out the form!", "danger")
     # Show registration form with message (if any)
+    msg = 'error'
     return render_template('login/signup-login.html', msg = msg)
 
 def weather_fetch(city_name):
@@ -330,6 +362,34 @@ def logout():
    session.pop('username', None)
    # Redirect to login page
    return redirect(url_for('login'))
+
+############OTP
+@app.route("/verify-email", methods=['GET', 'POST'])
+def verify_email():
+    if request.method == 'POST' :
+        token = request.form['token']
+        data = jwt.decode(token, os.getenv('app.secret_key'))
+        email_address = data["email_address"]
+        password = data["password"]
+        ... # Create the user
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        # cursor.execute('SELECT * FROM farmers WHERE username = %s', (username))
+        cursor.execute( "UPDATE farmers SET status = 1 WHERE email = %s",(email_address) )
+
+        msg = 'Account verified'
+        flash("You have successfully registered!", "success")
+        return render_template('login/signup-login.html', msg=msg)
+    elif request.method == 'POST':
+        # Form is empty... (no POST data)
+        msg = 'Please fill out the form!'
+        flash("Please fill out the form!", "danger")
+    # Show registration form with message (if any)
+    return render_template('login/verify_email.html', msg = msg)
+
+
+
+####Recover
+
 
 
 #####MPESAAA

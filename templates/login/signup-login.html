@@ -3,8 +3,9 @@
 {% block body %}
 
 <div class="container">
-    {% include "includes/alert.html" %}
+    
     <div class="forms-container">
+      {% include "includes/alert.html" %}
       <div class="signin-signup">
         <form action="/logini" method="post" class="sign-in-form" name="login">
           <h2 class="title">Sign in</h2>
@@ -18,7 +19,7 @@
           </div>
           <div class="msg">{{ msg }}</div>
           <input type="submit" value="Login" class="btn solid" name="login" />
-          <a class="social-text" href="recover_psw.php" class="btn btn-link">Forgot Your Password?</a>
+          <a class="social-text" href="/recover" class="btn btn-link">Forgot Your Password?</a>
           <p class="social-text">Or Sign in with social platforms</p>
           <!--<div class="social-media">
             <a href="#" class="social-icon">
