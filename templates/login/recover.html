@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css">
+    <title>Verify | Avodoc</title>
+    <!-- Social media CDN -->
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
     <script
       src="https://kit.fontawesome.com/64d58efce2.js"
       crossorigin="anonymous"
@@ -19,20 +23,48 @@
 	<!-- bootstrap css -->
 	<link href="{{ url_for('static', filename='css/font-awesome.min.css') }}" rel="stylesheet"><!-- fontawesome css -->
 	<!-- //css files -->
-  <!-- favicon -->
-  <link rel="icon" href="{{ url_for('static', filename='images/logo3.png') }}" type="image/gif" />
-
-	<script type="text/JavaScript" src="{{ url_for('static', filename='scripts/cities.js') }}"></script>
 	<!-- google fonts -->
 	<link href="//fonts.googleapis.com/css?family=Thasadith:400,400i,700,700i&amp;subset=latin-ext,thai,vietnamese"
 		rel="stylesheet">
 	<!-- //google fonts -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style-signup.css') }}" />
-    <link rel="icon" href="{{ url_for('static', filename='images/logo3.png') }}" type="image/gif" />
-    <title>Sign in & Sign up | Avodoc</title>
+    <link rel="stylesheet" href="static/css/style-verification.css">
+    <link rel="icon" href="static/images/logo3.png" type="image/gif" />
   </head>
-  <body>
-    {% block body %} {% endblock %}
-<script src="{{ url_for('static', filename='scripts/app-signup-login.js') }}"></script>
+  <style>
+  </style>
+
+<body>
+    
+    <!-- Recover password -->
+    <div class="container">
+      <div class="forms-container">
+        {% include "includes/alert.html" %}
+        <div class="reset-password">
+          <form action="/recover" class="sign-in-form" method="POST">
+            <h2 class="title">User Password Recover</h2>
+           	<div class="input-field">
+              <i class="fas fa-key"></i>
+              <input type="text" placeholder="Email Address" name="email" id="email_address" required autofocus>
+            </div>   
+            <input type="submit" value="Recover" class="btn solid" name="recover">
+          </form>
+        </div>
+        </div>
+            
+      <!-- left panel -->
+      <div class="panels-container">
+        <div class="panel left-panel">
+          <div class="content">
+            <h3>Forgot you Password?</h3>
+            <p>
+                Kindly enter your email address that you used when you signed up<br>
+                We will help you recover your password ASAP.
+            </p>
+          </div>
+          
+          <a href="{{ url_for('home1') }}"><img src="static/images/img.svg" class="image" alt="" /></a>
+        </div>
+      </div>
+  </div>
 </body>
 </html>

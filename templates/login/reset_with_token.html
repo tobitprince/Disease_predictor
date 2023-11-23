@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css">
+    <title>Reset | Avodoc</title>
+    <!-- Social media CDN -->
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+	</body>
+	<!-- css files -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel='stylesheet' type='text/css' />
+	<!-- bootstrap css -->
+	<link href="{{ url_for('static', filename='css/font-awesome.min.css') }}" rel="stylesheet"><!-- fontawesome css -->
+	<!-- //css files -->
+	<!-- google fonts -->
+	<link href="//fonts.googleapis.com/css?family=Thasadith:400,400i,700,700i&amp;subset=latin-ext,thai,vietnamese"
+		rel="stylesheet">
+	<!-- //google fonts -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style-verification.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/logo3.png') }}" type="image/gif" />
+  </head>
+  <style>
+  </style>
+
+<body>
+    {% include "includes/alert.html" %}
+    <!-- Recover password -->
+    <div class="container">
+      <div class="forms-container">
+        <div class="reset-password">
+          <form action="{{ url_for('rst')}}" class="sign-in-form" method="POST">
+            <h2 class="title">Reset</h2>
+            <input type="text" name="token" id="token" value="{{token}}" hidden   required autofocus>
+           	<div class="input-field">
+              <i class="fas fa-key"></i>
+              <input type="text" placeholder="New Password" name="password" id="password" required autofocus>
+              <i class="bi bi-eye-slash" id="togglePassword"></i>
+            </div>   
+            <div class="input-field">
+                <i class="fas fa-key"></i>
+                <input type="text" placeholder="Confirm Password" name="confirm_password" id="confirm_password" required autofocus>
+                <i class="bi bi-eye-slash" id="togglePassword"></i>
+              </div>  
+            <input type="submit" value="Reset" class="btn solid" name="reset">
+          </form>
+        </div>
+        </div>
+            
+      <!-- left panel -->
+      <div class="panels-container">
+        <div class="panel left-panel">
+          <div class="content">
+            <h3>Reset your Password?</h3>
+            <p>
+                Dear User, Kindly enter your new password<br>
+                We will help you reset your password ASAP.
+            </p>
+          </div>
+         
+          <a href="url_for{{home1}}"><img src="{{ url_for('static', filename='images/img.svg') }}" class="image" alt="" /></a>
+        </div>
+      </div>
+  </div>
+</body>
+</html>

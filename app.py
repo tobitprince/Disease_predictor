@@ -24,15 +24,15 @@ from datetime import datetime
 from dotenv import load_dotenv
 import os
 from functools import wraps
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 import base64
 from flask_mail import Mail, Message
 import jwt
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-
-
+from itsdangerous import URLSafeTimedSerializer
+from werkzeug.security import check_password_hash
 
 
 app = Flask(__name__)
@@ -166,32 +166,28 @@ def home3():
     return redirect(url_for('admin')) 
 @ app.route('/crop-recommend')
 def crop_recommend():
-    return render_template('crop.html')
+    return render_template('crop.html',username=session['username'])
 
 @ app.route('/login')
 def login():
-    print("mysql.connection:", mysql.connection)  # Print the value of mysql.connection
     return render_template('login/signup-login.html')
 
 # http://localhost:5000/login/ - this will be the login page, we need to use both GET and POST requests
 @app.route('/logini', methods=['GET', 'POST'])
 def logini():
-    msg = ''
     if request.method == 'POST' and 'email' in request.form and 'password' in request.form:
         email = request.form['email']
         password = request.form['password']
 
-        hash = password + os.getenv('app.secret_key')
-        hash = hashlib.sha1(hash.encode())
-        password = hash.hexdigest()
 
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
-        cursor.execute('SELECT * FROM farmers WHERE email = %s AND password = %s', (email, password))
+        cursor.execute('SELECT * FROM farmers WHERE email = %s', (email,))
         account = cursor.fetchone()
+        print(account['password'])
 
-        if account:
-            cursor.execute('SELECT * FROM farmers WHERE email = %s AND password = %s AND status = 1', (email, password))
+        if account and check_password_hash(account['password'], password):
+            cursor.execute('SELECT * FROM farmers WHERE email = %s AND status = 1', (email,))
             verified_account = cursor.fetchone()
             if verified_account:
                 session['loggedin'] = True
@@ -237,10 +233,7 @@ def register():
         else:
     
             # Hash the password
-            hash = password + os.getenv('app.secret_key')
-            hash = hashlib.sha1(hash.encode())
-            password = hash.hexdigest()
-            print(password)
+            password = generate_password_hash(request.form['password'])
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
             cursor.execute('INSERT INTO farmers VALUES (NULL, %s, %s, %s, %s)', (username,email_address, password, status))
             mysql.connection.commit()
@@ -382,7 +375,7 @@ def disease_prediction():
         prediction = Markup(str(disease_dic[prediction]))
         return render_template('disease-result.html', prediction=prediction)
 
-    return render_template('disease.html')
+    return render_template('disease.html',username=session['username'])
 
     @app.route('/service-worker.js')
     def sw():
@@ -439,8 +432,124 @@ def verify_email():
         return render_template('login/verify_email.html', msg='An error occurred')
 
 
+###################
+####Recover########
+###################
+@app.route('/forgot_password')
+def forgot_password():
+     return render_template("login/recover.html")
+@app.route('/recover', methods=['GET', 'POST'])
+def recover():
+    if request.method == 'POST':
+        email_address = request.form['email']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        # cursor.execute('SELECT * FROM farmers WHERE username = %s', (username))
+        cursor.execute( "SELECT * FROM farmers WHERE email LIKE %s", [email_address] )
+        account = cursor.fetchone()
 
-####Recover
+        if account:
+            serializer = URLSafeTimedSerializer(os.getenv('app.secret_key'))
+            token = serializer.dumps(email_address, salt = os.getenv('salt'))
+
+            port = os.getenv('port')  # For starttls
+            smtp_server = os.getenv('smtp_server')
+            sender_email = os.getenv('sender_email')
+            receiver_email = email_address
+            password = os.getenv('password')
+
+            # Convert the token to a string
+            #token_str = token.decode('utf-8')
+
+            link = url_for('reset_with_token', token=token, _external=True)
+
+
+            try:
+                
+                message = MIMEMultipart("alternative")
+                message["Subject"] = "Password Reset Request"
+                message["From"] = sender_email
+                message["To"] = receiver_email
+
+                # Create the plain-text and HTML version of your message
+                text = """\
+                Hi,
+                Your link is {}
+                With regards,
+                Avodoc""".format(link)
+                html = """\
+                <html>
+                <body>
+                    <p>Hi,<br>
+                    Dear user, </p> <h3>Your link is </h3>
+                    <br><br>
+                      {}
+                    </p>
+                    <br><br>
+                    <p>With regards,</p>
+                    <b>Avodoc</b>
+                </body>
+                </html>
+                """.format(link)
+
+                # Turn these into plain/html MIMEText objects
+                part1 = MIMEText(text, "plain")
+                part2 = MIMEText(html, "html")
+
+                # Add HTML/plain-text parts to MIMEMultipart message
+                # The email client will try to render the last part first
+                message.attach(part1)
+                message.attach(part2)
+
+                context = ssl.create_default_context()
+                with smtplib.SMTP(smtp_server, port) as server:
+                    server.ehlo()  # Can be omitted
+                    server.starttls(context=context)
+                    server.ehlo()  # Can be omitted
+                    server.login(sender_email, password)
+                    server.sendmail(sender_email, receiver_email, message.as_string())
+                flash('An email has been sent with instructions to reset your password.', 'success')
+                
+            except Exception as e:
+                print(f"Error sending email: {e}")
+                return render_template("login/recover.html")
+        else:
+            flash('No account found for that email address.', 'danger')
+
+    return render_template('login/recover.html')
+
+@app.route('/reset/<token>', methods=['GET', 'POST'])
+def reset_with_token(token):
+    try:
+        serializer = URLSafeTimedSerializer(os.getenv('app.secret_key'))
+        email_address = serializer.loads(token, salt=os.getenv('salt'), max_age=3600)
+        return render_template('login/reset_with_token.html', token=token, _external=True)
+    except:
+        flash('The password reset link is invalid or has expired.', 'danger')
+        return redirect(url_for('recover'))
+    
+@app.route('/rst', methods = ['GET', 'POST'])
+def rst():
+    if request.method == 'POST':
+        token = request.form['token']
+        serializer = URLSafeTimedSerializer(os.getenv('app.secret_key'))
+        email_address = serializer.loads(token, salt=os.getenv('salt'), max_age=3600)
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+        if password != confirm_password:
+            flash('Passwords do not match.', 'danger')
+            return render_template('login/reset_with_token.html')
+        # Hash the password
+        password = generate_password_hash(request.form['password'])
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("UPDATE farmers SET password = %s WHERE email = %s", (password, email_address,))
+        mysql.connection.commit()
+
+        flash('Your password has been updated!', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('login/reset_with_token.html')
+                  
+
 
 
 
@@ -502,14 +611,84 @@ def get_access_token():
     endpoint = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
 
     r = requests.get(endpoint, auth=HTTPBasicAuth(consumer_key, consumer_secret))
-    try:
-        data = r.json()
-        return data['access_token']
-    except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
-        print(f"Response: {r.text}")
+    if r.status_code == 200:
+        try:
+            data = r.json()
+            return data['access_token']
+        except requests.exceptions.RequestException as e:
+            print(f"Error: {e}")
+            print(f"Response: {r.text}")
+            return "Error occurred"
+    else:
+        print(f"Error: Received status code {r.status_code}")
+        print(r.text)  # print the response text
         return "Error occurred"
 
+
+###################
+####CONTACT########
+###################
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+     if request.method == 'POST' and 'name' in request.form and 'email' in request.form and 'subject' in request.form and 'message' in request.form:
+            name = request.form['name']
+            email_address = request.form['email']
+            subject = request.form['subject']
+            message = request.form['message']
+
+            port = os.getenv('port')  # For starttls
+            smtp_server = os.getenv('smtp_server')
+            sender_email = os.getenv('sender_email')
+            receiver_email = email_address
+            password = os.getenv('password')
+            try:
+                message = MIMEMultipart("alternative")
+                message["Subject"] = subject
+                message["From"] = sender_email
+                message["To"] = receiver_email
+
+                # Create the plain-text and HTML version of your message
+                text = """\
+                Hi {name},
+                Thank you for contacting us and we will attend to you right away
+                With regards,
+                Avodoc""".format(name = name)
+                html = """\
+                <html>
+                <body>
+                    <p>Hi {name},<br>
+                    Thank you for contacting us and we will attend to you right away
+                    <br><br>
+                    </p>
+                    <br><br>
+                    <p>With regards,</p>
+                    <b>Avodoc</b>
+                </body>
+                </html>
+                """.format(name = name)
+
+                # Turn these into plain/html MIMEText objects
+                part1 = MIMEText(text, "plain")
+                part2 = MIMEText(html, "html")
+
+                # Add HTML/plain-text parts to MIMEMultipart message
+                # The email client will try to render the last part first
+                message.attach(part1)
+                message.attach(part2)
+
+                context = ssl.create_default_context()
+                with smtplib.SMTP(smtp_server, port) as server:
+                    server.ehlo()  # Can be omitted
+                    server.starttls(context=context)
+                    server.ehlo()  # Can be omitted
+                    server.login(sender_email, password)
+                    server.sendmail(sender_email, receiver_email, message.as_string())
+                flash('Your message has been sent', 'success')
+            except Exception as e:
+                print(f"Error sending email: {e}")
+                flash('Error sending email', 'danger')
+            return redirect(url_for('home2'))
+     return render_template('index3.html')
 
 
 
@@ -734,6 +913,7 @@ def delete_one(mysql, table_name, modifier, item_id):
 	except Exception as e:
 		print("Problem deleting from db: " + str(e))
 		return False
+
 
 
 if __name__ == "__main__":
