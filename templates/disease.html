@@ -40,7 +40,7 @@
   </nav>
 <br /><br />
   <h2 style="text-align: center; margin: 0px; color: black">
-    <b>Find out which disease your crop is suffreing</b>
+    <b>Find out which disease your crop is suffering</b>
   </h2>
   <br />
   <br>
@@ -58,10 +58,10 @@
   
 
 
-  <form class="form-signin" method=post enctype=multipart/form-data>
+  <form action="/submit" class="form-signin" method=post enctype=multipart/form-data>
 
     <h2 class="h4 mb-3 font-weight-normal"><b>Please Upload The Image</b></h2>
-    <input type="file" name="file" class="form-control-file" id="inputfile" onchange="preview_image(event)" style="font-weight: bold;">
+    <input type="file" name="image" class="form-control-file" id="inputfile" onchange="preview_image(event)" style="font-weight: bold;">
     <br />
     <img id="output-image" class="rounded mx-auto d-block" />
     <button class="btn btn-lg btn-primary btn-block" type="submit" style="font-weight: bold;">Predict</button>
