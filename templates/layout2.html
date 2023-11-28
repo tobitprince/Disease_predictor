@@ -109,6 +109,17 @@
            });
         });
      </script>
+     <script type="text/javascript">
+      function preview_image(event) {
+        var reader = new FileReader();
+        reader.onload = function () {
+          var output = document.getElementById('output-image')
+          output.src = reader.result;
+        }
+        reader.readAsDataURL(event.target.files[0]);
+      }
+    </script>
+    
      <script src="{{ url_for('static', filename='scripts/app.js') }}"></script>
   </body>
 </html>

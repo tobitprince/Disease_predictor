@@ -431,9 +431,40 @@ def profile():
         cursor.execute('SELECT * FROM farmers WHERE id = %s', (session['id'],))
         account = cursor.fetchone()
         # Show the profile page with account info
-        return render_template('login/profile.html', account=account)
+        return render_template('login/profile.html', account=account, username=session['username'])
     # User is not logged in redirect to login page
     return redirect(url_for('login'))
+
+@app.route('/edit_profile/<string:act>/<int:modifier_id>', methods=['GET', 'POST'])
+def edit_profile(modifier_id, act):
+	if act == "add":
+		return render_template('login/edit_profile.html', data="", act="add")
+	else:
+		data = fetch_one(mysql, "farmers", "id", modifier_id)
+	
+		if data:
+			return render_template('login/edit_profile.html', data=data, act=act, username=session['username'])
+		else:
+			return 'Error loading #%s' % modifier_id
+          
+@app.route('/saveprofile', methods=['GET', 'POST'])
+def saveprofile():
+	cat = ''
+	if request.method == 'POST':
+		post_data = request.form.to_dict()
+		if 'password' in post_data:
+			post_data['password'] = generate_password_hash(post_data['password']) 
+		if post_data['act'] == 'add':
+			cat = post_data['cat']
+			insert_one(mysql, cat, post_data)
+		elif post_data['act'] == 'edit':
+			cat = post_data['cat']
+			update_one(mysql, cat, post_data, post_data['modifier'], post_data['id'])
+	else:
+		if request.args['act'] == 'delete':
+			cat = request.args['cat']
+			delete_one(mysql, cat, request.args['modifier'], request.args['id'])
+	return redirect("/home2")
 
 # http://localhost:5000/python/logout - this will be the logout page
 @app.route('/logout')

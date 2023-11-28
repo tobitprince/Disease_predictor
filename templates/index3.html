@@ -3,37 +3,40 @@
 {% block body %}
  <!-- banner section end -->
  <!-- header section start -->
-      <div class="header_section">
-         {% include "includes/alert.html" %}
-         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="logo"><a href="{{ url_for('home2') }}"><img style = "width: 20% !important;" src="{{ url_for('static', filename='images/avodoc-high-resolution-logo-color-on-transparent-background (2).png') }}"></a></div>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-               <div class="navbar-nav">
-                  <a class="nav-item nav-link" href="{{ url_for('home1') }}">Home</a>
-              
-               </div>
-            </div>
-            <div class="login_menu">
-               <ul>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('crop_recommend') }}">Crop</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('disease_prediction') }}">Disease</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('profile') }}">{{ username }}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('logout') }}">LOG OUT</a>
-                </li>
-               </ul>
-            </div>
-         </nav>
+ <div class="header_section">
+   {% include "includes/alert.html" %}
+   <nav class="navbar navbar-expand-lg navbar-light bg-light">
+       <div class="logo">
+           <a href="{{ url_for('home2') }}">
+               <img style="width: 20% !important;" src="{{ url_for('static', filename='images/avodoc-high-resolution-logo-color-on-transparent-background (2).png') }}">
+           </a>
+       </div>
+       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+           <span class="navbar-toggler-icon"></span>
+       </button>
+       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+           <div class="navbar-nav">
+               <a class="nav-item nav-link" href="{{ url_for('home1') }}">Home</a>
+           </div>
+       </div>
+       <div class="login_menu">
+           <ul>
+               <li class="nav-item">
+                   <a class="nav-link" href="{{ url_for('crop_recommend') }}">Crop</a>
+               </li>
+               <li class="nav-item">
+                   <a class="nav-link" href="{{ url_for('disease_prediction') }}">Disease</a>
+               </li>
+               <li class="nav-item">
+                   <a class="nav-link text-capitalize" href="{{ url_for('profile') }}">{{ username }}</a>
+               </li>
+               <li class="nav-item">
+                   <a class="nav-link" href="{{ url_for('logout') }}">LOG OUT</a>
+               </li>
+           </ul>
+       </div>
+   </nav>
+</div>
  <div class="banner_section layout_padding">
    
     <div id="main_slider" class="carousel slide" data-ride="carousel">
@@ -52,7 +55,7 @@
                 </div>
                 <div class="custum_menu">
                    <ul>
-                      <li class="active"><a href="{{ url_for('home1') }}">Home</a></li>
+                      <li hidden class="active"><a href="{{ url_for('home1') }}"></a></li>
                       
                    </ul>
                 </div>
@@ -72,7 +75,7 @@
                 </div>
                 <div class="custum_menu">
                    <ul>
-                      <li class="active"><a href="{{ url_for('home1') }}">Home</a></li>
+                      <li hidden class="active"><a href="{{ url_for('home1') }}">Home</a></li>
                       
                       
                    </ul>
@@ -93,7 +96,7 @@
                 </div>
                 <div class="custum_menu">
                    <ul>
-                      <li class="active"><a href="{{ url_for('home1') }}">Home</a></li>
+                      <li hidden class="active"><a href="{{ url_for('home1') }}">Home</a></li>
                       
                    </ul>
                 </div>
@@ -119,7 +122,7 @@
 
 
  <!-- contact section start -->  
- <div class="contact_section layout_padding">
+ <div class="contact_section ">
     <div class="container">
        <h1 class="contact_text">Contact us</h1>
     </div>

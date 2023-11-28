@@ -30,7 +30,7 @@
              <a class="nav-link" href="{{ url_for('disease_prediction') }}">Disease</a>
          </li>
          <li class="nav-item">
-             <a class="nav-link" href="{{ url_for('profile') }}">{{ username }}</a>
+             <a class="nav-link text-capitalize" href="{{ url_for('profile') }}">{{ username }}</a>
          </li>
          <li class="nav-item">
              <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
@@ -38,7 +38,9 @@
         </ul>
      </div>
   </nav>
+  </div>
 <br /><br />
+<div class="container layout_padding">
   <h2 style="text-align: center; margin: 0px; color: black">
     <b>Find out which disease your crop is suffering</b>
   </h2>
@@ -69,17 +71,8 @@
 
   </form>
 </div>
-
-<script type="text/javascript">
-  function preview_image(event) {
-    var reader = new FileReader();
-    reader.onload = function () {
-      var output = document.getElementById('output-image')
-      output.src = reader.result;
-    }
-    reader.readAsDataURL(event.target.files[0]);
-  }
-</script>
-
 </div>
+
+
+
 {% endblock %}
