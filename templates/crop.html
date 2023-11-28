@@ -28,7 +28,8 @@
      <div class="login_menu">
         <ul>
          <li class="nav-item">
-             <a class="nav-link" href="{{ url_for('crop_recommend') }}">Crop</a>
+             <a class="nav-link active" href="{{ url_for('crop_recommend') }}">Crop</a>
+             <span class="sr-only">(current)</span>
          </li>
 
          <li class="nav-item">
@@ -38,13 +39,15 @@
              <a class="nav-link text-capitalize" href="{{ url_for('profile') }}">{{ username }}</a>
          </li>
          <li class="nav-item">
-             <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+             <a class="nav-link" href="{{ url_for('logout') }}" style="a:hover {color: #757575!important;background-color: #5f0404!important;}">
+              Logout</a>
          </li>
         </ul>
      </div>
   </nav>
   </div>
-<!--Form Section-->
+<div class="container layout_padding">
+  <!--Form Section-->
 <br /><br />
 <h2 style="text-align: center; margin: 0px; color: black">
   <b>Find out the most suitable crop to grow in your farm</b>
@@ -126,20 +129,32 @@
       />
     </div>
     <div class="form-group">
-      <label for="State" style="font-size: 17px "><b>State</b></label>
+      <label for="county" style="font-size: 17px "><b>County</b></label>
       <br>
       <select
-        onchange="print_city('state', this.selectedIndex);"
-        id="sts"
-        name="stt"
+        onchange="print_sub('sub', this.selectedIndex);"
+        id="county"
+        name="county"
         class="form-control"
         style="font-weight: bold; color: black;"
         
         required
       ></select>
-      <script language="javascript">
-        print_state("sts");
-      </script>
+      </div>
+      <br>
+      <br>
+      <br>
+      <div class="form-group">
+      <label for="sub" style="font-size: 17px"><b>Sub County</b></label>
+      <br>
+      <select
+        id="sub"
+        class="form-control"
+        name="subcounty"
+        style="font-weight: bold; color: black;"
+        required
+      ></select>
+      
     </div>
 
     <div class="d-flex justify-content-center">
@@ -157,5 +172,6 @@
 
 
 <!-- Form section -->
+</div>
 
 {% endblock %}

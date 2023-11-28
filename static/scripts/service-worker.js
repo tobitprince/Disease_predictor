@@ -6,8 +6,9 @@
 const cacheName = 'flask-PWA-v3';
 const filesToCache = [
     '/',
-    '/static/app.js',
-    '/static/styles.css',
+    '/static/scripts/app.js',
+    '/static/css/style.css',
+    '/static/css/style1.css',
     '/static/images/pwa-light.png'
 ];
 

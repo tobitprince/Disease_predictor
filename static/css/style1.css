@@ -19,7 +19,6 @@
 @import url(../css/font-awesome.min.css);
 @import url(meanmenu.css);
 @import url(owl.carousel.min.css);
-@import url(swiper.min.css);
 @import url(slick.css);
 @import url(jquery.fancybox.min.css);
 @import url(jquery-ui.css);
@@ -1115,4 +1114,10 @@ textarea.massage-bt::placeholder {
 
 .margin_top_90 {
     margin-top: 90px;
+}
+.active  { 
+	color: #13cf897a!important;
+    font-size: 23px;
+    font-weight: bolder;
+    transition: 2s;
 }

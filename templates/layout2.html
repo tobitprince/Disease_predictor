@@ -29,7 +29,7 @@
       <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.carousel.min.css') }}">
       <link rel="stylesoeet" href="{{ url_for('static', filename='css/owl.them.default.min.css') }}">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
-      <script type="text/JavaScript" src="{{ url_for('static', filename='scripts/cities.js') }}"></script>
+      <script type="text/JavaScript" src="{{ url_for('static', filename='scripts/counties.js') }}"></script>
       <script>
 		addEventListener("load", function () {
 			setTimeout(hideURLbar, 0);
@@ -99,8 +99,9 @@
      <script src="{{ url_for('static', filename='scripts/jquery.mCustomScrollbar.concat.min.js') }}"></script>
      <script src="{{ url_for('static', filename='scripts/custom.js') }}"></script>
      <!-- javascript --> 
-     <script src="{{ url_for('static', filename='scripts/owl.carousel.js') }}"></script>
+     
      <script src="https:cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+     <script src="{{ url_for('static', filename='scripts/service-worker.js') }}"></script>
      <script>
         $(document).ready(function(){
         $(".fancybox").fancybox({
@@ -119,6 +120,20 @@
         reader.readAsDataURL(event.target.files[0]);
       }
     </script>
+    <script language="javascript">
+      print_county("county");
+    </script>
+    <script>
+      window.onload = function() {
+          // Call print_county when the page loads
+          print_county('county');
+  
+          // Add an onchange event to the county dropdown
+          document.getElementById('county').onchange = function() {
+              print_sub('sub', this.selectedIndex);
+          }
+      }
+      </script>
     
      <script src="{{ url_for('static', filename='scripts/app.js') }}"></script>
   </body>
