@@ -208,7 +208,7 @@ def register():
                 # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         # cursor.execute('SELECT * FROM farmers WHERE username = %s', (username))
-        cursor.execute( "SELECT * FROM farmers WHERE username LIKE %s", [username] )
+        cursor.execute( "SELECT * FROM farmers WHERE email LIKE %s", [email_address] )
         account = cursor.fetchone()
         # If account exists show error and validation checks
         if account:
