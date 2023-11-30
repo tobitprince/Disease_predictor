@@ -133,6 +133,9 @@
               print_sub('sub', this.selectedIndex);
           }
       }
+
+      document.getElementById('sub').style.display = 'block'; // To show the dropdown
+      document.getElementById('sub').style.display = 'none'; // To hide the dropdown
       </script>
     
      <script src="{{ url_for('static', filename='scripts/app.js') }}"></script>
