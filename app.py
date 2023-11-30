@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, Markup, url_for, session, flash
+from flask import Flask, render_template, request, redirect, Markup, url_for, session, flash, Response, send_file
 import numpy as np
 import pandas as pd
 from disease_dic import disease_dic
@@ -36,6 +36,8 @@ from werkzeug.security import check_password_hash
 from PIL import Image
 import torchvision.transforms.functional as TF
 import CNN
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 
 
 app = Flask(__name__)
@@ -116,6 +118,14 @@ def submit():
         supplement_name = supplement_info['supplement name'][pred]
         supplement_image_url = supplement_info['supplement image'][pred]
         supplement_buy_link = supplement_info['buy link'][pred]
+
+        # Store the image, user's name, and the result in the database
+        filez = os.path.join('uploads', filename).replace('\\', '/')
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO farmerimage(username, imagepath, result) VALUES (%s, %s, %s)", (session['username'], filez, title))
+        mysql.connection.commit()
+        cur.close()
+
         return render_template('submit.html',username=session['username'] , title = title , desc = description , prevent = prevent , 
                                image_url = image_url , pred = pred ,sname = supplement_name , simage = supplement_image_url , buy_link = supplement_buy_link)
 
@@ -766,6 +776,12 @@ def edit_admintable(modifier_id, act):
 		else:
 			return 'Error loading #%s' % modifier_id
 
+@app.route("/farmerimage")
+@login_required
+def farmerimage():
+	data = fetch_all(mysql, "farmerimage")
+	return render_template('admin/farmerimage.html', data=data, table_count=len(data))
+
 
 @app.route('/save', methods=['GET', 'POST'])
 @login_required
@@ -920,6 +936,40 @@ def delete_one(mysql, table_name, modifier, item_id):
 	except Exception as e:
 		print("Problem deleting from db: " + str(e))
 		return False
+      
+
+@app.route('/report', methods=['GET'])
+@login_required
+def report():
+    # Connect to the database
+    cur = mysql.connection.cursor()
+
+    # Execute a SELECT query with JOIN statement to get the data
+    cur.execute("SELECT farmers.*, farmerimage.* FROM farmers JOIN farmerimage ON farmers.id = farmerimage.farmer_id")
+
+    # Fetch the results of the query
+    data = cur.fetchall()
+
+    cur.close()
+
+    # Create a new PDF file
+    pdf_file = os.path.join('static', 'report.pdf')
+    c = canvas.Canvas(pdf_file, pagesize=letter)
+
+    # Add the data to the PDF
+    x = 10
+    y = 750
+    for i, row in enumerate(data):
+        if i % 30 == 0 and i != 0:  # 30 rows per page
+            c.showPage()
+            y = 750  # Reset y to top of page
+        c.drawString(x, y, f"Farmer Data: {row[0]}, Image Data: {row[1]}")
+        y -= 25  # Move down one line
+
+    # Save the PDF
+    c.save()
+
+    return send_file(pdf_file, as_attachment=True, download_name='report.pdf')
 
 
 

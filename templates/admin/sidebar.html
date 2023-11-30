@@ -25,7 +25,7 @@
 	<a href="/farmers">
 		<i class="glyphicon glyphicon-user"></i>
 		Farmers
-		<span class="pull-right">{{tables_and_counts.1.1}}</span>
+		<span class="pull-right">{{tables_and_counts.2.1}}</span>
 	</a>
 </li>
 
@@ -37,7 +37,16 @@
 	</a>
 </li>
 
-		<li><a href="/adminlogout"><i class="glyphicon glyphicon-log-out"></i> Logout</a></li>
+<li>
+	<a href="/farmerimage">
+		<i class="glyphicon glyphicon-user"></i>
+		Farmer Images
+		<span class="pull-right">{{tables_and_counts.1.1}}</span>
+	</a>
+</li>
+		<li style="color: green;"><a href="/report"><i class="glyphicon glyphicon-download-alt"></i> Download Report</a></li>
+
+		<li style="color: red;"><a href="/adminlogout"><i class="glyphicon glyphicon-log-out"></i> Logout</a></li>
 	</ul>
 	<div class ="visit">
 	<a href="./"><img src="{{ url_for('static', filename='images/palta.svg') }}" class="image" alt="" /></a>
