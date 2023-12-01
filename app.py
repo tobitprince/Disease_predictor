@@ -38,6 +38,10 @@ import torchvision.transforms.functional as TF
 import CNN
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import Image as ReportLabImage
 
 
 app = Flask(__name__)
@@ -941,40 +945,64 @@ def delete_one(mysql, table_name, modifier, item_id):
 		return False
       
 
+
+
+
 @app.route('/report', methods=['GET'])
 @login_required
 def report():
     # Connect to the database
     cur = mysql.connection.cursor()
 
-    # Execute a SELECT query with JOIN statement to get the data
-    cur.execute("SELECT farmers.*, farmerimage.* FROM farmers JOIN farmerimage ON farmers.id = farmerimage.farmer_id")
+    # Execute a SELECT query to get the data from farmerimage table
+    cur.execute("SELECT * FROM farmerimage")
+    images_data = cur.fetchall()
 
-    # Fetch the results of the query
-    data = cur.fetchall()
+    # Get the column names from the cursor description
+    column_names = [desc[0] for desc in cur.description]
+
+    # Add the column names as the first row of the data
+    images_data = [column_names] + list(images_data)
 
     cur.close()
 
     # Create a new PDF file
     pdf_file = os.path.join('static', 'report.pdf')
-    c = canvas.Canvas(pdf_file, pagesize=letter)
+    doc = SimpleDocTemplate(pdf_file, pagesize=letter)
 
-    # Add the data to the PDF
-    x = 10
-    y = 750
-    for i, row in enumerate(data):
-        if i % 30 == 0 and i != 0:  # 30 rows per page
-            c.showPage()
-            y = 750  # Reset y to top of page
-        c.drawString(x, y, f"Farmer Data: {row[0]}, Image Data: {row[1]}")
-        y -= 25  # Move down one line
+    # Add the heading and logo to the PDF
+    styles = getSampleStyleSheet()
+    title = Paragraph("Avodoc", styles['Title'])
+    logo_path = os.path.join('static', 'images', 'logo3.png')
+    logo = ReportLabImage(logo_path, width=100, height=50)  # Adjust the path and dimensions as needed
 
-    # Save the PDF
-    c.save()
+    # Add a new paragraph
+    paragraph_text = "Avocados are not just a trendy addition to our diets but also a vital component of agricultural economies"
+    paragraph = Paragraph(paragraph_text, styles['BodyText'])
+
+    # Create the tables
+    images_table = Table(images_data)
+
+    # Customize the appearance of the tables
+    style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 14),
+
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0,0), (-1,-1), 1, colors.black)
+    ])
+    images_table.setStyle(style)
+
+    # Add the elements to the PDF
+    elements = [title, logo, Spacer(1, 50), paragraph, Spacer(1, 20), images_table]
+    doc.build(elements)
 
     return send_file(pdf_file, as_attachment=True, download_name='report.pdf')
-
-
 
 if __name__ == "__main__":
 	app.run(debug=True)
