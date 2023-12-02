@@ -139,14 +139,14 @@ def submit():
 
 @ app.route('/')
 def home1():
-    return render_template('index2.html')
+    return render_template('index.html')
 
 @ app.route('/home2')
 def home2():
     # Check if user is loggedin
     if 'loggedin' in session:
         # User is loggedin show them the home page
-        return render_template('index3.html', username=session['username'],title="Home")
+        return render_template('home.html', username=session['username'],title="Home")
     # User is not loggedin redirect to login page
     return redirect(url_for('login')) 
 @ app.route('/home3')
@@ -712,7 +712,7 @@ def contact():
                 print(f"Error sending email: {e}")
                 flash('Error sending email', 'danger')
             return redirect(url_for('home2'))
-     return render_template('index3.html')
+     return render_template('home.html')
 
 
 

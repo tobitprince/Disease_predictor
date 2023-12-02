@@ -1,79 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-	<title>Harvestify - Home </title>
-	<!-- for-mobile-apps -->
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	    <link rel="manifest" href="{{ url_for('static', filename='scripts/manifest.json') }}" />
-   
-	<meta charset="utf-8">
-	<meta name="keywords" content="Agro Harvest Responsive web template, Bootstrap Web Templates, Flat Web Templates, Android Compatible web template, 
-Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyEricsson, Motorola web design" />
-
-<style>
-	html { font-size: 1rem; }
-
-@media (min-width: 576px) {
-    html { font-size: 1.25rem; }
-}
-@media (min-width: 768px) {
-    html { font-size: 1.5rem; }
-}
-@media (min-width: 992px) {
-    html { font-size: 1.75rem; }
-}
-@media (min-width: 1200px) {
-    html { font-size: 2rem; }
-	html {
-   font-size: 1rem;
-}
-h1 {
-  font-size: 1.2rem;
-}
-h2 {
-  font-size: 1.1rem;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 1.1rem;
-  }
-  h1 {
-      font-size: 1.3rem;
-  }
-  h2 {
-      font-size: 1.2rem;
-  }
-}
-
-@media (min-width: 991px) {
-    html {
-    font-size: 1.2rem;
-  }
-  h1 {
-      font-size: 1.5rem;
-  }
-  h2 {
-      font-size: 1.4rem;
-  }
-}
-
-@media (min-width: 1200px) {
-  html {
-    font-size: 1.2rem;
-  }
-  h1 {
-      font-size: 1.7rem;
-  }
-  h2 {
-      font-size: 1.6rem;
-  }
-}
-
-}
-</style>
-	<script>
+   <head>
+      <!-- basic -->
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <!-- mobile metas -->
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+      <!-- site metas -->
+      <title>Avodoc</title>
+      <meta name="keywords" content="">
+      <meta name="description" content="">
+      <meta name="author" content="">
+      <!-- bootstrap css -->
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+      <!-- style css -->
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style1.css') }}">
+      <!-- Responsive-->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+      <!-- fevicon -->
+      <link rel="icon" href="{{ url_for('static', filename='images/logo3.png') }}" type="image/gif" />
+      <!-- Scrollbar Custom CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.mCustomScrollbar.min.css') }}">
+      <!-- Tweaks for older IEs-->
+      <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+      <!-- owl stylesheets --> 
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.carousel.min.css') }}">
+      <link rel="stylesoeet" href="{{ url_for('static', filename='css/owl.them.default.min.css') }}">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
+      <script type="text/JavaScript" src="{{ url_for('static', filename='scripts/counties.js') }}"></script>
+      <script>
 		addEventListener("load", function () {
 			setTimeout(hideURLbar, 0);
 		}, false);
@@ -83,112 +40,104 @@ h2 {
 		}
 
 	</script>
+   </head>
+   <body>
+     
+         {% block body %} {% endblock %}
+          <!-- footer section start --> 
+      <div class="footer_section layout_padding">
+        <div class="container">
+           <div class="row">
+              <div class="col-lg-3 col-sm-6">
+                 <h2 class="useful_text">About</h2>
+                 <p class="ipsum_text">Avodoc</p>
+                 <p class="ipsum_text"><a href="/mpesa" style="color:white!important;">Support Us</a></p>
+              </div>
+              <div class="col-lg-3 col-sm-6">
+                 <h2 class="useful_text"></h2>
+                 <div class="footer_links">
+                    <ul>
+                       
+                    </ul>
+                 </div>
+              </div>
+              <div class="col-lg-3 col-sm-6">
+                 <h2 class="useful_text"></h2>
+                 <div class="footer_links">
+                    <ul>
+                       
+                    </ul>
+                 </div>
+              </div>
+              <div class="col-lg-3 col-sm-6">
+                 <h2 class="useful_text">contact us</h2>
+                 <div class="addres_link">
+                    <ul>
+                       <li><a href="#"><img src="{{ url_for('static', filename='images/map-icon.png') }}"><span class="padding_left_10">Strathmore University</span></a></li>
+                       <li><a href="#"><img src="{{ url_for('static', filename='images/call-icon.png') }}"><span class="padding_left_10">+254711977888</span></a></li>
+                       <li><a href="#"><img src="{{ url_for('static', filename='images/mail-icon.png') }}"><span class="padding_left_10">princekiptoo@gmail.com</span></a></li>
+                    </ul>
+                 </div>
+              </div>
+           </div>
+        </div>
+     </div>
+\
+     <div class="copyright_section">
+        <div class="container">
+           <p class="copyright_text">Prince Tobit</p>
+        </div>
+     </div>
+         
+     <!-- Javascript files-->
+     <script src="{{ url_for('static', filename='scripts/jquery.min.js') }}"></script>
+     <script src="{{ url_for('static', filename='scripts/popper.min.js') }}"></script>
+     <script src="{{ url_for('static', filename='scripts/bootstrap.bundle.min.js') }}"></script>
+     <script src="{{ url_for('static', filename='scripts/jquery-3.0.0.min.js') }}"></script>
+     <script src="{{ url_for('static', filename='scripts/plugin.js') }}"></script>
+     <!-- sidebar -->
+     <script src="{{ url_for('static', filename='scripts/jquery.mCustomScrollbar.concat.min.js') }}"></script>
+     <script src="{{ url_for('static', filename='scripts/custom.js') }}"></script>
+     <!-- javascript --> 
+     
+     <script src="https:cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+     <script src="{{ url_for('static', filename='scripts/service-worker.js') }}"></script>
+     <script>
+        $(document).ready(function(){
+        $(".fancybox").fancybox({
+           openEffect: "none",
+           closeEffect: "none"
+           });
+        });
+     </script>
+     <script type="text/javascript">
+      function preview_image(event) {
+        var reader = new FileReader();
+        reader.onload = function () {
+          var output = document.getElementById('output-image')
+          output.src = reader.result;
+        }
+        reader.readAsDataURL(event.target.files[0]);
+      }
+    </script>
+    <script language="javascript">
+      print_county("county");
+    </script>
+    <script>
+      window.onload = function() {
+          // Call print_county when the page loads
+          print_county('county');
+  
+          // Add an onchange event to the county dropdown
+          document.getElementById('county').onchange = function() {
+              print_sub('sub', this.selectedIndex);
+          }
+      }
 
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-	</body>
-	<!-- css files -->
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-	<link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel='stylesheet' type='text/css' />
-	<!-- bootstrap css -->
-	<link href="{{ url_for('static', filename='css/style.css') }}" rel='stylesheet' type='text/css' />
-	<!-- custom css -->
-	<link href="{{ url_for('static', filename='css/font-awesome.min.css') }}" rel="stylesheet"><!-- fontawesome css -->
-	<!-- //css files -->
-
-	<script type="text/JavaScript" src="{{ url_for('static', filename='scripts/cities.js') }}"></script>
-
-
-
-	<!-- google fonts -->
-	<link href="//fonts.googleapis.com/css?family=Thasadith:400,400i,700,700i&amp;subset=latin-ext,thai,vietnamese"
-		rel="stylesheet">
-	<!-- //google fonts -->
-
-	<style>
-		header {
-			background-color: rgba(30, 30, 30, 1);
-			margin-top: 0rem;
-			display: block;
-
-		}
-	</style>
-</head>
-
-<body>
-
-	<!-- Navigation -->
-	<nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
-		<div class="container">
-			<a class="navbar-brand" href="{{ url_for('home') }}">
-				<img src="{{ url_for('static', filename='images/logo.png') }}" style="width: 100px; height: 50px"alt="">
-			</a>
-			<button class="navbar-toggler" type="button" data-toggle="collapse"
-				data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
-				aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-			<div class="collapse navbar-collapse" id="navbarResponsive">
-				<ul class="navbar-nav ml-auto">
-					<li class="nav-item active">
-						<a class="nav-link" href="{{ url_for('home') }}">Home
-							<span class="sr-only">(current)</span>
-						</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="{{ url_for('crop_recommend') }}">Crop</a>
-					</li>
-
-					<li class="nav-item">
-						<a class="nav-link" href="{{ url_for('disease_prediction') }}">Disease</a>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</nav>
-
-
-
-
-	{% block body %} {% endblock %}
-
-	<!-- footer -->
-	<footer class="text-center py-5">
-		<div class="container py-md-3">
-			<!-- logo -->
-			<h2 class="logo2 text-center">
-				<a href="{{ url_for('home') }}">
-					<span class="fa fa-leaf"></span> Harvestify
-				</a>
-			</h2>
-			<!-- //logo -->
-			<!-- address -->
-			<div class="contact-left-footer mt-4">
-
-				<p class="homelogo">
-					<a href="{{ url_for('home') }}">Home</a>
-
-				
-
-					<!-- <a href="community.html">Community</a> -->
-				</p>
-			</div>
-			<div class="w3l-copy text-center">
-				<p class="text-da">An Environmental Intelligence Startup<br> </p>
-			</div>
-		</div>
-	</footer>
-	<!-- //footer -->
-
-	<!-- move top icon -->
-	<a href="#home" class="move-top text-center"></a>
-	<!-- //move top icon -->
-
-
-	<script src="{{ url_for('static', filename='scripts/app.js') }}"></script>
-</body>
-
+      document.getElementById('sub').style.display = 'block'; // To show the dropdown
+      document.getElementById('sub').style.display = 'none'; // To hide the dropdown
+      </script>
+    
+     <script src="{{ url_for('static', filename='scripts/app.js') }}"></script>
+  </body>
 </html>
