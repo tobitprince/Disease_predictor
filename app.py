@@ -113,7 +113,6 @@ def submit():
         filename = image.filename
         file_path = os.path.join('static/uploads', filename)
         image.save(file_path)
-        print(file_path)
         pred = prediction(file_path)
         title = disease_info['disease_name'][pred]
         description =disease_info['description'][pred]
@@ -177,7 +176,6 @@ def logini():
 
         cursor.execute('SELECT * FROM farmers WHERE email = %s', (email,))
         account = cursor.fetchone()
-        print(account['password'])
 
         if account and check_password_hash(account['password'], password):
             cursor.execute('SELECT * FROM farmers WHERE email = %s AND status = 1', (email,))
@@ -243,7 +241,7 @@ def register():
 
             # Now you can decode the token
             decoded_data = jwt.decode(token, os.getenv('app.secret_key'), algorithms=["HS256"])
-            print(f"Type of email_address: {type(email_address)}")
+            #print(f"Type of email_address: {type(email_address)}")
             port = os.getenv('port')  # For starttls
             smtp_server = os.getenv('smtp_server')
             sender_email = os.getenv('sender_email')
@@ -824,16 +822,16 @@ def adminlogin():
 def login_handler():
     email = request.form['email']
     password = request.form['password']
-    print(f"Email: {email}, Password: {password}")  # Debug print
+    #print(f"Email: {email}, Password: {password}")  # Debug print
     try:
         data = fetch_one(mysql, "admintable", "email", email)
-        print(f"Data fetched from database: {data}")  # Debug print
+        #print(f"Data fetched from database: {data}")  # Debug print
     except Exception as e:
         return render_template('admin/login.html', error=str(e))
 
     if data and len(data) > 0:
         password_check = check_password_hash(data['password'], password)
-        print(f"Password check result: {password_check}")  # Debug print
+        #print(f"Password check result: {password_check}")  # Debug print
         if password_check:
             session['authorised'] = 'authorised',
             session['id'] = data['id']
