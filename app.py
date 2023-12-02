@@ -127,7 +127,7 @@ def submit():
         filez = os.path.join('uploads', filename).replace('\\', '/')
         cur = mysql.connection.cursor()
         # Fetch the farmer's id
-        cur.execute("SELECT id FROM farmers WHERE username = %s", session['username'])
+        cur.execute("SELECT id FROM farmers WHERE username = %s", (session['username'],))
         farmer_id = cur.fetchone()[0]
         cur.execute("INSERT INTO farmerimage(username, imagepath, result, farmer_id) VALUES (%s, %s, %s, %s)", (session['username'], filez, title,farmer_id))
         mysql.connection.commit()
