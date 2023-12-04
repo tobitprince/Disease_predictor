@@ -1,1 +1,1 @@
-A plant disease predictor app using python and flask
+A plant disease predictor app using python,CNN and flask
