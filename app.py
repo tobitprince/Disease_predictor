@@ -574,8 +574,9 @@ def rst():
 
 
 
-
-#####MPESAAA
+#################
+#####MPESAAA#####
+#################
 
 @ app.route('/mpesa')
 def mpesa():
@@ -648,7 +649,7 @@ def get_access_token():
 
 
 ###################
-####CONTACT########
+####CONTACT MODULE########
 ###################
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
