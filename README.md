@@ -4,6 +4,8 @@ A plant disease predictor app using python,CNN and flask
 ## Background information
 This project aimed to develop a convolutional neural network model, which has been deployed on a web application to enable farmers to predict avocado diseases and receive potential remedies for the identified diseases, allowing them to make informed decisions and take appropriate measures to minimize the impact of these diseases on their avocado crops.
 
+![Custopedia home page](static/images/home_page.png)
+
 
 ## Tech stack overview
 Below is a brief overview of the tech stack leveraged to bring Avodoc to life.
